@@ -84,8 +84,8 @@ sap.ui.jsview("e2e-nwcloud-app-persons-list-web-orig.personsdata", {
     			width : "200px"
     		}));
 
-    		oTable.bindRows("/persons");
-
+    		oTable.bindRows("/Person");
+    		
     		return oTable;
         }
 });
