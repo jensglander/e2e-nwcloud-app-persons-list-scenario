@@ -92,6 +92,7 @@
 			<scope>system</scope>
 			<systemPath>${local.eclipse.root}/plugins/com.sap.ui5.resource_${nw.cloud.sapui5.version}.jar</systemPath>
 		</dependency>
+ 
 
 		<!-- Required for testing -->
 		<dependency>
@@ -114,6 +115,38 @@
 			<version>0.6.0</version>
 		</dependency>
 
+		<!-- Required for integration testing -->
+        <dependency>
+            <groupId>httpunit</groupId>
+            <artifactId>httpunit</artifactId>
+            <version>1.6.2</version> <!-- Do NOT use 1.7 as it submits form twice -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xmlParserAPIs</artifactId>
+            <version>2.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.6.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+            <version>0.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>1.6R5</version>
+            <scope>test</scope>
+        </dependency>
+        
 		<dependency>
 			<groupId>com.sap.netweaver.cloud.sample</groupId>
 			<artifactId>e2e-nwcloud-app-jpa-model-orig</artifactId>
@@ -312,6 +345,142 @@
 		</pluginManagement>
 	</build>
 
+ 	<profiles>
+        <!-- Activate compiler warnings when matching JDK is present (compiler then doesn't generate bootstrap warnings) -->
+        <profile>
+            <id>compiler-warnings</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <jdk>1.6</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>2.5.1</version>
+                        <configuration>
+                            <compilerArguments>
+                                <Werror />
+                            </compilerArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Choose correct command line scripts for interaction with SAP NetWeaver Cloud based on detected operating system -->
+        <profile>
+            <id>unix-scripts</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>Unix</family>
+                </os>
+            </activation>
+            <properties>
+                <nw.cloud.console.shell>sh</nw.cloud.console.shell>
+                <nw.cloud.console.script>neo.sh</nw.cloud.console.script>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-scripts</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <nw.cloud.console.shell>cmd</nw.cloud.console.shell>
+                <nw.cloud.console.script>/c neo.bat</nw.cloud.console.script>
+            </properties>
+        </profile>
+
+        <!-- Install local server from the P2 repository that is contained inside the SDK, deploy the built web application
+            into it, start local server, wait for it and the built and deployed web application to become available, integration-test
+            the web application on the local server, and stop the local server finally -->
+        <profile>
+            <id>local-integration-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-local-server</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="${project.build.directory}/${project.artifactId}.war" todir="${local.server.root}/pickup" />
+                                        <exec dir="${nw.cloud.sdk.path}/tools" executable="${nw.cloud.console.shell}"
+                                            failonerror="true">
+                                            <arg
+                                                line="${nw.cloud.console.script} install-local --location ${local.server.root} --jmxPort ${local.server.jmx.port} --httpPort ${local.server.http.port} --httpsPort ${local.server.https.port} --ajpPort ${local.server.ajp.port} --httpProxyHost ${proxy.host} --httpProxyPort ${proxy.port} --httpsProxyHost ${proxy.host} --httpsProxyPort ${proxy.port}" />
+                                        </exec>
+                                        <exec dir="${nw.cloud.sdk.path}/tools" executable="${nw.cloud.console.shell}"
+                                            failonerror="true">
+                                            <arg
+                                                line="${nw.cloud.console.script} start-local --location ${local.server.root} --consolePort ${local.server.console.port} --waitUrl http://${local.server.host}:${local.server.http.port}/${project.artifactId}/ --waitUrlTimeout 120" />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>cleanup-local-server</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${nw.cloud.sdk.path}/tools" executable="${nw.cloud.console.shell}"
+                                            failonerror="true">
+                                            <arg
+                                                line="${nw.cloud.console.script} stop-local --consolePort ${local.server.console.port}" />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>execute-local-integration-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+									<argLine>-Dhttp.proxyHost=${proxy.host}
+										-Dhttp.proxyPort=${proxy.port} -Dhttps.proxyHost=${proxy.host}
+										-Dhttps.proxyPort=${proxy.port}</argLine>
+                                    <systemPropertyVariables>
+                                        <integration.test.server.url>http://${local.server.host}:${local.server.http.port}</integration.test.server.url>
+                                    </systemPropertyVariables>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>verify-local-integration-tests</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
 	<repositories>
 		<repository>
 			<id>EclipseLink Repo</id>
