@@ -1,0 +1,9 @@
+#This file contains JPA Diagram Editor settings
+#Fri Nov 16 13:38:52 CET 2012
+defaultTableNamePrefix=T_
+directEditAffectsClass=true
+accessType=field
+diagramFolder=diagrams
+collectionType=collection
+oneToManyOldStyle=false
+defaultPackage=com.sap.netweaver.cloud.sample
