@@ -107,6 +107,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- odata4j -->
+		<dependency>
+			<groupId>org.odata4j</groupId>
+			<artifactId>odata4j-cxf</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.sap.netweaver.cloud.sample</groupId>
 			<artifactId>e2e-nwcloud-app-jpa-model-orig</artifactId>
