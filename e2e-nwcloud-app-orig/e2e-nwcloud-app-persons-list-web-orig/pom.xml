@@ -1,0 +1,322 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>e2e-nwcloud-app-persons-list-web-orig</artifactId>
+	<packaging>war</packaging>
+
+	<parent>
+		<groupId>com.sap.netweaver.cloud.sample</groupId>
+		<artifactId>e2e-nwcloud-app-parent-orig</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<properties>
+		<!-- Properties that hold host and port of proxy should you have one -
+			otherwise remove all occurrences of the properties -->
+		<proxy.host>proxy</proxy.host>
+		<proxy.port>8080</proxy.port>
+
+		<!-- Properties that hold information on the location of the Eclipse installation -->
+		<local.eclipse.root>C:/nwcloud/eclipse</local.eclipse.root>
+
+		<!-- Properties that hold information on the version of the SAPUI5 -->
+		<nw.cloud.sapui5.version>1.6.4</nw.cloud.sapui5.version>
+
+		<!-- Properties that hold information on the location and version of the
+			SAP NetWeaver Cloud SDK -->
+		<nw.cloud.sdk.path>C:/nwcloud.sdk</nw.cloud.sdk.path>
+		<nw.cloud.sdk.version>1.13.1</nw.cloud.sdk.version>
+
+		<!-- Property that holds supported JDK version for the given SAP NetWeaver
+			Cloud SDK -->
+		<nw.cloud.jdk.version>1.6</nw.cloud.jdk.version>
+
+		<!-- Properties that hold information on your SAP NetWeaver Cloud account -->
+		<nw.cloud.host>netweaver.ondemand.com</nw.cloud.host>
+		<nw.cloud.account>${env.NW_CLOUD_ACCOUNT}</nw.cloud.account>
+		<nw.cloud.username>${env.NW_CLOUD_USERNAME}</nw.cloud.username>
+		<nw.cloud.password>${env.NW_CLOUD_PASSWORD}</nw.cloud.password>
+		<nw.cloud.application>sample</nw.cloud.application>
+
+		<!-- Properties that hold the local server information required for local
+			integration-testing -->
+		<local.server.root>${project.build.directory}/server</local.server.root>
+		<local.server.host>localhost</local.server.host>
+		<local.server.console.port>9003</local.server.console.port>
+		<local.server.jmx.port>9004</local.server.jmx.port>
+		<local.server.http.port>9080</local.server.http.port>
+		<local.server.https.port>9443</local.server.https.port>
+		<local.server.ajp.port>9009</local.server.ajp.port>
+
+		<!-- Property setting source encoding to UTF-8 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- Required for compilation and provided at runtime (SAP NetWeaver SDK
+			API libraries) -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JPA support -->
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.0.4.v201112200901</version>
+		</dependency>
+
+		<!-- Required for compilation and required at runtime (additional web application
+			libraries) -->
+		<dependency>
+			<groupId>com.sap.security.core.server</groupId>
+			<artifactId>csi</artifactId>
+			<version>1.0.1</version>
+			<scope>system</scope>
+			<systemPath>${nw.cloud.sdk.path}/repository/plugins/com.sap.security.core.server.csi_1.0.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sap.ui5.resource</groupId>
+			<artifactId>com.sap.ui5.resource</artifactId>
+			<version>${nw.cloud.sapui5.version}</version>
+			<scope>system</scope>
+			<systemPath>${local.eclipse.root}/plugins/com.sap.ui5.resource_${nw.cloud.sapui5.version}.jar</systemPath>
+		</dependency>
+
+		<!-- Required for testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sap.netweaver.cloud.sample</groupId>
+			<artifactId>e2e-nwcloud-app-jpa-model-orig</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<!-- Map the Eclipse file system layout to the Maven plug-ins -->
+		<sourceDirectory>${project.basedir}/src</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+		<outputDirectory>${project.basedir}/war/WEB-INF/classes</outputDirectory>
+		<testOutputDirectory>${project.basedir}/bin/classes</testOutputDirectory>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${project.basedir}/test</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<!-- Map the Eclipse file system layout to the Maven plug-ins -->
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<warName>${project.artifactId}</warName>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+					<archive>
+						<manifestFile>WebContent/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/WebContent/WEB-INF/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Set compiler to officially supported JDK version for the given SAP
+				NetWeaver Cloud SDK -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>${nw.cloud.jdk.version}</source>
+					<target>${nw.cloud.jdk.version}</target>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+
+			<!-- Include only unit tests for maven-surefire-plugin that is run in
+				test phase -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<excludes>
+						<exclude>**/integrationtest/**/*Test.java</exclude>
+					</excludes>
+					<includes>
+						<include>**/test/**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- Include only integration tests for maven-failsafe-plugin that is
+				run in integration-test phase -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<excludes>
+						<exclude>**/test/**/*Test.java</exclude>
+					</excludes>
+					<includes>
+						<include>**/integrationtest/**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- Enforce officially supported JDK and validated Maven version for
+				the given SAP NetWeaver Cloud SDK or higher -->
+			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>[${nw.cloud.jdk.version},2.0)</version>
+								</requireJavaVersion>
+								<requireMavenVersion>
+									<version>[3.0.3, 4.0.0)</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!-- Force m2e to ignore plugin goal that it doesn't support naturally -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-enforcer-plugin
+										</artifactId>
+										<versionRange>
+											[0.0.1,)
+										</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.5,)
+										</versionRange>
+										<goals>
+											<goal>
+												copy-dependencies
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>EclipseLink Repo</id>
+			<!-- note that ampersands in this URL are escaped because this is in an
+				xml file - un-escape them to use in browser -->
+			<url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+			<!-- use this for javax.persistence <snapshots> <enabled>true</enabled>
+				</snapshots> -->
+		</repository>
+		<repository>
+			<id>javax.persistence</id>
+			<url>http://dev.nightlabs.org/maven-repository/repo/org/eclipse/persistence/javax.persistence/2.0.4.v201112200901/</url>
+		</repository>
+	</repositories>
+</project>

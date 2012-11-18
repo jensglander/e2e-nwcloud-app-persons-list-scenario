@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.sap.netweaver.cloud.sample</groupId>
+	<artifactId>e2e-nwcloud-app-parent-orig</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>e2e-nwcloud-app-jpa-model-orig</module>
+		<module>e2e-nwcloud-app-persons-list-web-orig</module>
+	</modules>
+</project>

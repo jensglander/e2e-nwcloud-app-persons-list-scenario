@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="e2e-nwcloud-app-persons-list-web-orig">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="e2e-nwcloud-app-jpa-model-orig-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/e2e-nwcloud-app-jpa-model-orig/e2e-nwcloud-app-jpa-model-orig">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="e2e-nwcloud-app-persons-list-web-orig"/>
         <property name="java-output-path" value="/e2e-nwcloud-app-persons-list-web-orig/build/classes"/>
     </wb-module>

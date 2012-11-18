@@ -2,3 +2,7 @@
 /build
 # Maven build output directory
 /target
+
+# exclude files of type .jar, .class 
+*.jar
+*.class
