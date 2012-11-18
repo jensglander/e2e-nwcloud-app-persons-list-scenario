@@ -147,6 +147,14 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- necessary for selenium ui testing -->
+        <dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>2.25.0</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.sap.netweaver.cloud.sample</groupId>
 			<artifactId>e2e-nwcloud-app-jpa-model-orig</artifactId>
