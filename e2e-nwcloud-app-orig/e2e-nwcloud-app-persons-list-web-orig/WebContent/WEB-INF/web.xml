@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-                             http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         version="2.5"
-         xmlns="http://java.sun.com/xml/ns/javaee">
-
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <display-name>e2e-nwcloud-app-persons-list-web-orig</display-name>
-
-  <!-- ============================================================== -->
-  <!-- UI5 resource servlet used to handle application resources      -->
-  <!-- ============================================================== -->
-
   <servlet>
     <display-name>ResourceServlet</display-name>
     <servlet-name>ResourceServlet</servlet-name>
@@ -24,14 +14,10 @@
     <servlet-name>ResourceServlet</servlet-name>
     <url-pattern>/test-resources/*</url-pattern>
   </servlet-mapping>
-  <!-- BEGIN: DEV MODE -->
   <context-param>
     <param-name>com.sap.ui5.resource.DEV_MODE</param-name>
     <param-value>true</param-value>
   </context-param>
-  <!-- END: DEV MODE -->
-
-  <!-- This option enables proxying of resources from a remote location (in the cloud) -->
   <context-param>
     <param-name>com.sap.ui5.resource.REMOTE_LOCATION</param-name>
     <param-value>https://sapui5.netweaver.ondemand.com</param-value>
@@ -40,11 +26,6 @@
     <res-ref-name>jdbc/DefaultDB</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
   </resource-ref>
-
-  <!-- ============================================================== -->
-  <!-- Cache Control Filter to prevent caching of any resource        -->
-  <!-- ============================================================== -->
-
   <filter>
     <display-name>CacheControlFilter</display-name>
     <filter-name>CacheControlFilter</filter-name>
@@ -70,12 +51,6 @@
     <filter-name>CacheControlFilter</filter-name>
     <url-pattern>*.css</url-pattern>
   </filter-mapping>
-
-
-  <!-- ============================================================== -->
-  <!-- UI5 proxy servlet                                              -->
-  <!-- ============================================================== -->
-
   <servlet>
     <servlet-name>SimpleProxyServlet</servlet-name>
     <servlet-class>com.sap.ui5.proxy.SimpleProxyServlet</servlet-class>
@@ -84,15 +59,17 @@
     <servlet-name>SimpleProxyServlet</servlet-name>
     <url-pattern>/proxy/*</url-pattern>
   </servlet-mapping>
-
-
-  <!-- ============================================================== -->
-  <!-- Welcome file list                                              -->
-  <!-- ============================================================== -->
-
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
-
-
+  <servlet>
+    <description></description>
+    <display-name>PersonsJpaPersistenceServlet</display-name>
+    <servlet-name>PersonsJpaPersistenceServlet</servlet-name>
+    <servlet-class>com.sap.netweaver.cloud.sample.PersonsJpaPersistenceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PersonsJpaPersistenceServlet</servlet-name>
+    <url-pattern>/PersonsJpaPersistenceServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
